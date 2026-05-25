@@ -6,7 +6,7 @@ metadata:
 
 spec:
   serviceName: fluid-ai-postgres-service
-  replicas: 3
+  replicas: 1
 
   selector:
     matchLabels:
@@ -27,16 +27,9 @@ spec:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
 
-  volumeClaimTemplates:
-    - metadata:
-        name: postgres-storage
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 1Gi
-
+        volumes:
+        - name: postgres-storage
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
