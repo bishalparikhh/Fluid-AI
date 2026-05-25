@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+   name: fluid-ai-postgres
+   namespace: fluid-ai
+
+spec:
+  serviceName: fluid-ai-service
+  
+  replicas: 3
+
+  selector: 
+    matchLabels:
+        app: fluid-ai-postgres
+
+  template:
+     metadata:
+        labels:
+        app:fluid-ai-postgres
+
+     spec:
+       containers:
+        - name: postgers 
+          image: <> 
+          ports:
+           - containerPort: 5432
+          volumeMounts:
+           - name : postgres-storage 
+             mountPath: /var/lib/postgresql/data
+
+        VolumeClaimTemplates:
+         - metadata:
+            name:postgres-storage
+            
+           spec:
+             accessModes:
+              -ReadWriteOnce
+             resources:
+                requests:
+                  storage: 1Gi
+     
+--- 
+
+apiVersion: v1 
+kind: Service
+metadata : 
+   name: fluid-ai-postgres-service
+   namespace: fluid-ai
+
+spec:  
+  clusterIP: None
+  selector:
+     app: fluid-ai-postgres
+    
+  
+   
+
+
+
+
+         

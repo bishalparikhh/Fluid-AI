@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+   name: fluid-ai-api
+   namespace: fluid-ai
+
+
+spec: 
+ 
+ replicas: 2
+
+ selector:
+   matchlabels:
+     app: fluid-ai-api
+  
+  templates: 
+     metadata:
+       labels: 
+         app: fluid-ai-api
+
+     spec:
+      containers: 
+      - name : fluid api
+        image: <>
+        ports:
+         - containerPort: 8000
+        env:
+         - name: DB_HOST
+           value: postgres
+         - name : DB_USER
+           valueFrom: 
+              secretKeyRef:
+                   name: postgres-secret
+                   key: POSTGRES_USER
+          - name : DB_PASSWORD: 
+            valueFrom: 
+                secretKeyRef:
+                     name: postgres-secret
+                     key: POSTGRES_PASSWORD
