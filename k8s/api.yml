@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: fluid-api
-          image: IMAGE_PLACEHOLDER
+          image: I
 
           ports:
             - containerPort: 8000
