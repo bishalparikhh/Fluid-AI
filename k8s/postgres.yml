@@ -16,7 +16,7 @@ spec:
   template:
      metadata:
         labels:
-        app:fluid-ai-postgres
+        app: fluid-ai-postgres
 
      spec:
        containers:
@@ -28,7 +28,7 @@ spec:
            - name : postgres-storage 
              mountPath: /var/lib/postgresql/data
 
-        VolumeClaimTemplates:
+       VolumeClaimTemplates:
          - metadata:
             name:postgres-storage
             
