@@ -52,7 +52,7 @@ jobs:
 
       - name: Create Namespace
         run: |
-          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/namespace.yml
 
       - name: Update Image In Manifest
         run: |
