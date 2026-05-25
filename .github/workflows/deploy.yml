@@ -32,13 +32,13 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} \
             ./app
 
       - name: Push Docker Image
         run: |
           docker push \
-            $ECR_REGISTRY/$ECR_REPOSITORY:latest
+            $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
 
       - name: Configure kubectl
         run: |
@@ -50,11 +50,26 @@ jobs:
         run: |
           kubectl get nodes
 
-      - name: Apply Kubernetes Manifests
+      - name: Create Namespace
         run: |
-          kubectl apply -f k8s/
+          kubectl apply -f k8s/namespace.yaml
+
+      - name: Update Image In Manifest
+        run: |
+          sed -i "s|IMAGE_PLACEHOLDER|$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}|g" k8s/api.yml
+
+      - name: Deploy Resources
+        run: |
+          kubectl apply -f k8s/secret.yml
+          kubectl apply -f k8s/postgres.yml
+          kubectl apply -f k8s/api.yml
+
+      - name: Wait For Rollout
+        run: |
+          kubectl rollout status deployment/fluid-ai-api -n fluid-ai
 
       - name: Verify Deployment
         run: |
-          kubectl get ns
-          kubectl get all -A
+          kubectl get pods -n fluid-ai
+          kubectl get svc -n fluid-ai
+          kubectl get deployment -n fluid-ai
