@@ -1,77 +1,73 @@
 apiVersion: apps/v1
 kind: Deployment
-metadata: 
-   name: fluid-ai-api
-   namespace: fluid-ai
+metadata:
+  name: fluid-ai-api
+  namespace: fluid-ai
 
+spec:
+  replicas: 2
 
-spec: 
- 
- replicas: 2
+  selector:
+    matchLabels:
+      app: fluid-ai-api
 
- selector:
-   matchlabels:
-     app: fluid-ai-api
-  
-   templates: 
-     metadata:
-       labels: 
-         app: fluid-ai-api
+  template:
+    metadata:
+      labels:
+        app: fluid-ai-api
 
-     spec:
-      containers: 
-      - name : fluid api
-        image: <>
-        ports:
-         - containerPort: 8000
-        env:
-         - name: DB_HOST
-           value: postgres
-         - name : DB_USER
-           valueFrom: 
-              secretKeyRef:
-                   name: postgres-secret
-                   key: POSTGRES_USER
-         - name : DB_PASSWORD
-           valueFrom:
-                 secretKeyRef:
-                     name: postgres-secret
-                     key: POSTGRES_PASSWORD
-           readinessProbe:
-              httpGet:
-                 path: /health
-                 port: 8000
-              initialDelaySeconds: 5
-              periodSeconds: 5
-              
-           livenessProbe:
-               httpGet: 
-                  path: /health
-                  port: 8000
-               initialDelaySeconds: 10
-               periodSeconds: 10
+    spec:
+      containers:
+        - name: fluid-api
+          image: your-image:latest
+
+          ports:
+            - containerPort: 8000
+
+          env:
+            - name: DB_HOST
+              value: fluid-ai-postgres-service
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fluid-ai-db
+                  key: POSTGRES_USER
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fluid-ai-db
+                  key: POSTGRES_PASSWORD
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
 
 ---
 apiVersion: v1
 kind: Service
-metadata: 
-   name: fluid-ai-api-svc
-   namespace: fluid-ai 
+metadata:
+  name: fluid-ai-api-svc
+  namespace: fluid-ai
 
-spec: 
-
-  selector: 
-   app: fluid-ai-api
+spec:
+  selector:
+    app: fluid-ai-api
 
   type: NodePort
-  targetPort: 8000
-  
+
   ports:
-   - port: 8000
-     targetPort: 8000
-     nodePort: 30080
-
-
-
-
-            
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30080
