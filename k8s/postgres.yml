@@ -6,6 +6,7 @@ metadata:
 
 spec:
   serviceName: fluid-ai-postgres-service
+
   replicas: 1
 
   selector:
@@ -21,13 +22,31 @@ spec:
       containers:
         - name: postgres
           image: postgres:16
+
           ports:
             - containerPort: 5432
+
+          env:
+            - name: POSTGRES_DB
+              value: fluid_ai
+
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fluid-ai-db
+                  key: POSTGRES_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fluid-ai-db
+                  key: POSTGRES_PASSWORD
+
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
 
-        volumes:
+      volumes:
         - name: postgres-storage
           emptyDir: {}
 ---
@@ -39,6 +58,7 @@ metadata:
 
 spec:
   clusterIP: None
+
   selector:
     app: fluid-ai-postgres
 
